@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Mediator\Mediator.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Mediator.SourceGenerator\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj"
+                          OutputItemType="Analyzer"/>
+        <ProjectReference Include="..\Mediator\Mediator.csproj" />
+    </ItemGroup>
+</Project>
