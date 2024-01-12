@@ -1,133 +1,78 @@
 ﻿using Mediator.Exceptions;
 using Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Mediator;
 
-public class MediatorBase(IServiceProvider serviceProvider, IOptions<MediatorOptions> options)
+public class MediatorBase(IServiceProvider serviceProvider)
     : IMediator
 {
-    private readonly MediatorOptions _options = options.Value;
-
     public void Send<T>(T message)
     {
-        var receiverType = _options.Receivers
-            .Where(x => x.InputType == typeof(T) && x is
-            {
-                IsAsync: false,
-                HasResponse: false
-            })
-            .Select(x => x.Type).FirstOrDefault();
-        
-        if (receiverType == null || serviceProvider.GetRequiredService(receiverType) is not IReceiver<T> receiver)
+        var service = serviceProvider.GetService<IReceiver<T>>();
+        if (service == null)
         {
             throw new NoServiceException(typeof(T));
         }
-            
-        receiver.Receive(message);
+        
+        service.Receive(message);
     }
 
-    public Task SendAsync<T>(T message)
+    public async Task SendAsync<T>(T message)
     {
-        var receiverType = _options.Receivers
-            .Where(x => x.InputType == typeof(T) && x is
-            {
-                IsAsync: true,
-                HasResponse: false
-            })
-            .Select(x => x.Type).FirstOrDefault();
-        
-        if (receiverType == null || serviceProvider.GetRequiredService(receiverType) is not IAsyncReceiver<T> receiver)
+        var service = serviceProvider.GetService<IAsyncReceiver<T>>();
+        if (service == null)
         {
             Send(message);
-            return Task.CompletedTask;
-        }
-            
-        return receiver.ReceiveAsync(message);
-    }
-    
-    public TOutput Send<T, TOutput>(T message)
-    {
-        var receiverType = _options.Receivers
-            .Where(x => x.InputType.FullName == typeof(T).FullName && x is
-            {
-                IsAsync: false,
-                HasResponse: true
-            })
-            .Select(x => x.Type)
-            .FirstOrDefault();
-        
-        if (receiverType == null || 
-            serviceProvider.GetRequiredService(receiverType) is not IReceiver<T, TOutput> receiver)
-        {
-            throw new NoServiceException(typeof(T), typeof(TOutput));
+
+            return;
         }
         
-        return receiver.Receive(message);
+        await service.ReceiveAsync(message);
     }
-    
-    public Task<TOutput> SendAsync<T, TOutput>(T message)
-    {
-        var receiverType = _options.Receivers
-            .Where(x => x.InputType.FullName == typeof(T).FullName && x is
-            {
-                IsAsync: true,
-                HasResponse: true
-            })
-            .Select(x => x.Type)
-            .FirstOrDefault();
-        
-        if (receiverType == null || serviceProvider.GetRequiredService(receiverType) is not IAsyncReceiver<T, TOutput> receiver)
-        {
-            return Task.FromResult(Send<T, TOutput>(message));
-        }
-            
-        return receiver.ReceiveAsync(message);
-    }
-    
+
     public void Publish<T>(T message)
     {
-        foreach (var receiverType in _options.Receivers
-                     .Where(x => x.InputType == typeof(T) && x is
-                     {
-                         IsAsync: false,
-                         HasResponse: false
-                     })
-                     .Select(x => x.Type))
+        var services = serviceProvider.GetServices<IReceiver<T>>();
+        
+        foreach (var service in services)
         {
-            if (serviceProvider.GetRequiredService(receiverType) is not IReceiver<T> receiver)
-            {
-                continue;
-            }
-            
-            receiver.Receive(message);
+            service.Receive(message);
         }
     }
-    
+
     public Task PublishAsync<T>(T message)
     {
         List<Task> tasks = [];
         
-        foreach (var receiverType in _options.Receivers
-                     .Where(x => x.InputType == typeof(T) && x is
-                     {
-                         IsAsync: true,
-                         HasResponse: false
-                     })
-                     .Select(x => x.Type))
-        {
-            if (serviceProvider.GetRequiredService(receiverType) is not IAsyncReceiver<T> receiver)
-            {
-                continue;
-            }
-            
-            tasks.Add(receiver.ReceiveAsync(message));
-        }
+        tasks.AddRange(serviceProvider.GetServices<IAsyncReceiver<T>>().Select(x => x.ReceiveAsync(message)));
 
-        tasks.Add(
-            Task.Run(() => Publish(message)));
+        tasks.Add(Task.Run(() => Publish(message)));
         
         return Task.WhenAll(tasks);
+    }
+
+    public TOutput Send<T, TOutput>(T message)
+    {
+        var service = serviceProvider.GetService<IReceiver<T, TOutput>>();
+        
+        if (service == null)
+        {
+            throw new NoServiceException(typeof(T));
+        }
+        
+        return service.Receive(message);
+    }
+
+    public Task<TOutput> SendAsync<T, TOutput>(T message)
+    {
+        var service = serviceProvider.GetService<IAsyncReceiver<T, TOutput>>();
+
+        if (service == null)
+        {
+            return Task.FromResult(Send<T, TOutput>(message));
+        }
+        
+        return service.ReceiveAsync(message);
     }
 }

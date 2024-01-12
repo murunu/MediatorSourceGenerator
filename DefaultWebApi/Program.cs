@@ -24,7 +24,7 @@ app.MapGet("/test", async (IMediator mediator) =>
 {
     var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-    await mediator.SendAsync("bruh");
+    await mediator.SendAsync("A random message!");
 
     stopwatch.Stop();
 

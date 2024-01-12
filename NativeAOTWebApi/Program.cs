@@ -1,5 +1,4 @@
 using Mediator;
-using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 

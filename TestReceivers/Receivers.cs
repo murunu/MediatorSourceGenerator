@@ -10,7 +10,7 @@ public class ConcreteAsyncReceiver : IAsyncReceiver<string>
     public async Task ReceiveAsync(string message)
     {
         // Handle the received message
-        Console.WriteLine($"Received async message: {message}");
+        Console.WriteLine($"Received async message at ConcreteAsyncReceiver: {message}");
     }
 }
 
@@ -21,7 +21,7 @@ public class ConcreteReceiver : IReceiver<string>
     public void Receive(string message)
     {
         // Handle the received message
-        Console.WriteLine($"Received message: {message}");
+        Console.WriteLine($"Received at ConcreteReceiver message: {message}");
     }
 }
 
@@ -32,7 +32,7 @@ public class AnotherRandomReceiver : IReceiver<string>
     public void Receive(string message)
     {
         // Handle the received message
-        Console.WriteLine($"Received message: {message}");
+        Console.WriteLine($"Received at AnotherRandomReceiver message: {message}");
     }
 }
 
