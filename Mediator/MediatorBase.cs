@@ -1,4 +1,4 @@
-using Mediator.Exceptions;
+﻿using Mediator.Exceptions;
 using Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -45,7 +45,10 @@ public class MediatorBase(IServiceProvider serviceProvider)
     {
         List<Task> tasks = [];
         
-        tasks.AddRange(serviceProvider.GetServices<IAsyncReceiver<T>>().Select(x => x.ReceiveAsync(message)));
+        tasks.AddRange(
+            serviceProvider
+                .GetServices<IAsyncReceiver<T>>()
+                .Select(x => x.ReceiveAsync(message)));
 
         tasks.Add(Task.Run(() => Publish(message)));
         
