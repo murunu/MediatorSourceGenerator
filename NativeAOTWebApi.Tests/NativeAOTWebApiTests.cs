@@ -13,9 +13,12 @@ public class NativeAOTWebApiTests : IClassFixture<NativeAOTWebApiFactory>
     }
 
     [Theory]
-    [InlineData("/send/success", "Only 1 message sent!")]
-    [InlineData("/publish", "It worked!")]
-    [InlineData("/sendwithvalue/success?page=message", "message")]
+    [InlineData("/async/send/success", "Only 1 message sent!")]
+    [InlineData("/async/publish", "It worked!")]
+    [InlineData("/async/sendwithvalue/success/message", "message")]
+    [InlineData("/void/send/success", "Only 1 message sent!")]
+    [InlineData("/void/publish", "It worked!")]
+    [InlineData("/void/sendwithvalue/success/message", "message")]
     public async Task SendMessageShouldReturnSuccess(string endpoint, string expected)
     {
         // Arrange
@@ -33,8 +36,10 @@ public class NativeAOTWebApiTests : IClassFixture<NativeAOTWebApiFactory>
     }
     
     [Theory]
-    [InlineData("/send/error")]
-    [InlineData("/sendwithvalue/error?page=message")]
+    [InlineData("/async/send/failure")]
+    [InlineData("/async/sendwithvalue/failure/message")]
+    [InlineData("/void/send/failure")]
+    [InlineData("/void/sendwithvalue/failure/message")]
     public async Task SendMessageShouldReturnError(string endpoint)
     {
         // Arrange
