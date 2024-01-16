@@ -1,6 +1,5 @@
 using Mediator;
 using NativeAOTWebApi.Endpoints;
-using TestReceivers.Void;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
