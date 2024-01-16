@@ -106,18 +106,4 @@ public static class StringBuilderHelper
 
         return stringBuilder;
     }
-    
-    internal static StringBuilder TryAddScopedService(this StringBuilder stringBuilder, ItemToGenerate itemToGenerate, int indentation = 3)
-    {
-        stringBuilder.Append(
-            "Microsoft.Extensions.DependencyInjection.Extensions.ServiceCollectionDescriptorExtensions.TryAddScoped<", indentation);
-        stringBuilder.Append(itemToGenerate.InterfaceName);
-            
-        stringBuilder.Append(", ");
-        stringBuilder.Append(itemToGenerate.ClassName);
-        stringBuilder.Append(">(services);");
-        stringBuilder.AppendLine();
-        stringBuilder.AppendLine();
-        return stringBuilder;
-    }
 }

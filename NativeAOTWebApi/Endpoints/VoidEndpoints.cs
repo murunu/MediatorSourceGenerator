@@ -39,7 +39,9 @@ public static class VoidEndpoints
         /// <returns></returns>
         private static void SendFailure(IMediator mediator)
         {
-            mediator.Send(1);
+            var result = mediator.Send(1);
+            
+            result.ThrowIfFailure();
         }
     
         /// <summary>
@@ -69,7 +71,7 @@ public static class VoidEndpoints
             var result = mediator.Send<ReceiverType, ReceiverResponseType>(
                 new ReceiverType(page));
             
-            return result.ToString();
+            return result.Value.ToString();
         }
         
         /// <summary>
@@ -81,7 +83,8 @@ public static class VoidEndpoints
         /// <returns></returns>
         private static void SendWithValueFailure(string page, IMediator mediator)
         {
-            // This will throw an exception, no need to do anything with the result
-            mediator.Send<string, string>(page);
+            var result = mediator.Send<string, string>(page);
+            
+            result.ThrowIfFailure();
         }
 }

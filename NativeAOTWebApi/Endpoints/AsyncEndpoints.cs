@@ -39,7 +39,8 @@ public static class AsyncEndpoints
     /// <returns></returns>
     private static async Task SendFailure(IMediator mediator)
     {
-        await mediator.SendAsync(1);
+        var result = await mediator.SendAsync(1);
+        result.ThrowIfFailure();
     }
 
     /// <summary>
@@ -53,7 +54,7 @@ public static class AsyncEndpoints
     {
         await mediator.PublishAsync(
             new AsyncReceiverType("A random message!"));
-
+        
         return "It worked!";
     }
     
@@ -69,7 +70,7 @@ public static class AsyncEndpoints
         var result = await mediator.SendAsync<AsyncReceiverType, AsyncReceiverResponseType>(
             new AsyncReceiverType(page));
         
-        return result.ToString();
+        return result.Value.ToString();
     }
     
     /// <summary>
@@ -81,7 +82,8 @@ public static class AsyncEndpoints
     /// <returns></returns>
     private static async Task SendWithValueFailure(string page, IMediator mediator)
     {
-        // This will throw an exception, no need to do anything with the result
-        await mediator.SendAsync<string, string>(page);
+        var result = await mediator.SendAsync<string, string>(page);
+        
+        result.ThrowIfFailure();
     }
 }

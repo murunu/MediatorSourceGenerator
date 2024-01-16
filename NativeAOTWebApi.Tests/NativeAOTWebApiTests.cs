@@ -51,6 +51,6 @@ public class NativeAOTWebApiTests : IClassFixture<NativeAOTWebApiFactory>
         
         // Assert
         Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
-        Assert.StartsWith("Mediator.Exceptions.NoServiceException", content);
+        Assert.StartsWith("System.AggregateException", content);
     }
 }

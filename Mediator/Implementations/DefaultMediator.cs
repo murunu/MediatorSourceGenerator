@@ -8,41 +8,45 @@ namespace Mediator.Implementations;
 public class DefaultMediator(IServiceProvider serviceProvider)
     : IMediatorImplementation
 {
-    public void Send<T>(T message)
+    public MediatorResult Send<T>(T message)
     {
         var service = serviceProvider.GetService<IReceiver<T>>();
         if (service == null)
         {
-            throw new NoServiceException(typeof(T));
+            return new NoServiceException(typeof(T));
         }
         
         service.Receive(message);
+
+        return MediatorResult.Success();
     }
 
-    public async Task SendAsync<T>(T message)
+    public async Task<MediatorResult> SendAsync<T>(T message)
     {
         var service = serviceProvider.GetService<IAsyncReceiver<T>>();
         if (service == null)
         {
-            Send(message);
-
-            return;
+            return Send(message);
         }
         
         await service.ReceiveAsync(message);
+
+        return MediatorResult.Success();
     }
 
-    public void Publish<T>(T message)
+    public MediatorResult Publish<T>(T message)
     {
-        var services = serviceProvider.GetServices<IReceiver<T>>();
+        var services = serviceProvider.GetServices<IReceiver<T>>().ToList();
         
         foreach (var service in services)
         {
             service.Receive(message);
         }
+        
+        return MediatorResult.Success(services.Count);
     }
 
-    public Task PublishAsync<T>(T message)
+    public async Task<MediatorResult> PublishAsync<T>(T message)
     {
         List<Task> tasks = [];
         
@@ -52,31 +56,33 @@ public class DefaultMediator(IServiceProvider serviceProvider)
                 .Select(x => x.ReceiveAsync(message)));
 
         tasks.Add(Task.Run(() => Publish(message)));
+
+        await Task.WhenAll(tasks);
         
-        return Task.WhenAll(tasks);
+        return MediatorResult.Success(tasks.Count);
     }
 
-    public TOutput Send<T, TOutput>(T message)
+    public MediatorResult<TOutput> Send<T, TOutput>(T message)
     {
         var service = serviceProvider.GetService<IReceiver<T, TOutput>>();
         
         if (service == null)
         {
-            throw new NoServiceException(typeof(T), typeof(TOutput));
+            return new NoServiceException(typeof(T), typeof(TOutput));
         }
         
         return service.Receive(message);
     }
 
-    public Task<TOutput> SendAsync<T, TOutput>(T message)
+    public async Task<MediatorResult<TOutput>> SendAsync<T, TOutput>(T message)
     {
         var service = serviceProvider.GetService<IAsyncReceiver<T, TOutput>>();
 
         if (service == null)
         {
-            return Task.FromResult(Send<T, TOutput>(message));
+            return await Task.FromResult(Send<T, TOutput>(message));
         }
         
-        return service.ReceiveAsync(message);
+        return await service.ReceiveAsync(message);
     }
 }

@@ -48,11 +48,12 @@ public class BaseMediatorTest : TestBed<BaseMediatorTestFixture>
     {
         var response = await _mediator.SendAsync<AsyncReceiverType, AsyncReceiverResponseType>(
             new AsyncReceiverType(Message));
-        
+
         Assert.NotNull(response);
-        Assert.NotNull(response.Name);
-        Assert.NotEmpty(response.Name);
-        Assert.Equal(Message, response.Name);
+        Assert.NotNull(response.Value);
+        Assert.NotNull(response.Value.Name);
+        Assert.NotEmpty(response.Value.Name);
+        Assert.Equal(Message, response.Value.Name);
     }
     
     [Fact]
@@ -62,9 +63,10 @@ public class BaseMediatorTest : TestBed<BaseMediatorTestFixture>
             new ReceiverType(Message));
         
         Assert.NotNull(response);
-        Assert.NotNull(response.Name);
-        Assert.NotEmpty(response.Name);
-        Assert.Equal(Message, response.Name);
+        Assert.NotNull(response.Value);
+        Assert.NotNull(response.Value.Name);
+        Assert.NotEmpty(response.Value.Name);
+        Assert.Equal(Message, response.Value.Name);
     }
     
     [Fact]
@@ -74,9 +76,10 @@ public class BaseMediatorTest : TestBed<BaseMediatorTestFixture>
             new ReceiverType(Message));
         
         Assert.NotNull(response);
-        Assert.NotNull(response.Name);
-        Assert.NotEmpty(response.Name);
-        Assert.Equal(Message, response.Name);
+        Assert.NotNull(response.Value);
+        Assert.NotNull(response.Value.Name);
+        Assert.NotEmpty(response.Value.Name);
+        Assert.Equal(Message, response.Value.Name);
     }
 
     [Fact]
@@ -94,26 +97,38 @@ public class BaseMediatorTest : TestBed<BaseMediatorTestFixture>
     [Fact]
     public async Task SendAsyncWithInvalidTypeShouldThrowException()
     {
-        await Assert.ThrowsAsync<NoServiceException>(() => _mediator.SendAsync(Number));
+        var result = await _mediator.SendAsync(Number);
+        var exception = Assert.Throws<AggregateException>(result.ThrowIfFailure);
+        Assert.IsType<NoServiceException>(exception.InnerException);
     }
     
     [Fact]
     public void SendWithInvalidTypeShouldThrowException()
     {
-        Assert.Throws<NoServiceException>(() => _mediator.Send(Number));
+        var result = _mediator.Send(Number);
+        var exception = Assert.Throws<AggregateException>(result.ThrowIfFailure);
+        Assert.IsType<NoServiceException>(exception.InnerException);
     }
     
     [Fact]
     public async Task SendAsyncWithInvalidReturnTypeShouldThrowException()
     {
         const string message = "Hello World!";
-        await Assert.ThrowsAsync<NoServiceException>(() => _mediator.SendAsync<string, int>(message));
+
+        var result = await _mediator.SendAsync<string, int>(message);
+        
+        var exception = Assert.Throws<AggregateException>(() => result.ThrowIfFailure());
+        Assert.IsType<NoServiceException>(exception.InnerException);
     }
     
     [Fact]
     public void SendWithInvalidReturnTypeShouldThrowException()
     {
         const string message = "Hello World!";
-        Assert.Throws<NoServiceException>(() => _mediator.Send<string, int>(message));
+
+        var result = _mediator.Send<string, int>(message);
+        
+        var exception = Assert.Throws<AggregateException>(() => result.ThrowIfFailure());
+        Assert.IsType<NoServiceException>(exception.InnerException);
     }
 }

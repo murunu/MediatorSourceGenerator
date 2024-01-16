@@ -1,5 +1,4 @@
 ﻿using Mediator.Exceptions;
-using Mediator.Helpers;
 using Mediator.Implementations.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,32 +7,9 @@ namespace Mediator;
 public class BaseMediator(IServiceProvider serviceProvider)
     : IMediator
 {
-    public void Send<T>(T message)
+    public MediatorResult Send<T>(T message)
     {
-        var service = serviceProvider.GetService<IMediatorImplementation>();
-        if (service == null)
-        {
-            throw new NoImplementationException();
-        }
-        
-        service.Send(message);
-    }
-
-    public Task SendAsync<T>(T message)
-    {
-        var service = serviceProvider.GetService<IMediatorImplementation>();
-        if (service == null)
-        {
-            throw new NoImplementationException();
-        }
-        
-        return service.SendAsync(message);
-    }
-
-    public void Publish<T>(T message)
-    {
-        var services = serviceProvider.GetServices<IMediatorImplementation>()
-            .ToList();
+        var services = serviceProvider.GetServices<IMediatorImplementation>().ToList();
         if (services is {Count: 0})
         {
             throw new NoImplementationException();
@@ -41,14 +17,17 @@ public class BaseMediator(IServiceProvider serviceProvider)
         
         foreach (var service in services)
         {
-            service.Publish(message);
+            var result = service.Send(message);
+
+            return result;
         }
+
+        return MediatorResult.Failure(new NoImplementationException());
     }
 
-    public async Task PublishAsync<T>(T message)
+    public async Task<MediatorResult> SendAsync<T>(T message)
     {
-        var services = serviceProvider.GetServices<IMediatorImplementation>()
-            .ToList();
+        var services = serviceProvider.GetServices<IMediatorImplementation>().ToList();
         if (services is {Count: 0})
         {
             throw new NoImplementationException();
@@ -56,29 +35,102 @@ public class BaseMediator(IServiceProvider serviceProvider)
         
         foreach (var service in services)
         {
-            await service.PublishAsync(message);
+            var result = await service.SendAsync(message);
+
+            return result;
         }
+
+        return MediatorResult.Failure(new NoImplementationException());
     }
 
-    public TOutput Send<T, TOutput>(T message)
+    public MediatorResult Publish<T>(T message)
     {
-        var service = serviceProvider.GetService<IMediatorImplementation>();
-        if (service == null)
+        var services = serviceProvider.GetServices<IMediatorImplementation>()
+            .ToList();
+        if (services is {Count: 0})
+        {
+            throw new NoImplementationException();
+        }
+
+        var results = services.Select(x => x.Publish(message)).ToList();
+
+        var result = results.FirstOrDefault();
+        foreach (var item in results)
+        {
+            if (result == null)
+            {
+                result = item;
+                continue;
+            }
+            
+            result += item;
+        }
+        
+        return result ?? MediatorResult.Failure(new NoImplementationException());
+    }
+
+    public async Task<MediatorResult> PublishAsync<T>(T message)
+    {
+        var services = serviceProvider.GetServices<IMediatorImplementation>()
+            .ToList();
+        if (services is {Count: 0})
+        {
+            throw new NoImplementationException();
+        }
+
+        var tasks = services.Select(x => x.PublishAsync(message)).ToList();
+
+        await Task.WhenAll(tasks);
+        var results = tasks.Select(x => x.Result).ToList();
+
+        var result = results.FirstOrDefault();
+        foreach (var item in results)
+        {
+            if (result == null)
+            {
+                result = item;
+                continue;
+            }
+            
+            result += item;
+        }
+        
+        return result ?? MediatorResult.Failure(new NoImplementationException());
+    }
+
+    public MediatorResult<TOutput> Send<T, TOutput>(T message)
+    {
+        var services = serviceProvider.GetServices<IMediatorImplementation>().ToList();
+        if (services is {Count: 0})
         {
             throw new NoImplementationException();
         }
         
-        return service.Send<T, TOutput>(message);
+        foreach (var service in services)
+        {
+            var result = service.Send<T, TOutput>(message);
+
+            return result;
+        }
+
+        return new NoImplementationException();
     }
 
-    public Task<TOutput> SendAsync<T, TOutput>(T message)
+    public async Task<MediatorResult<TOutput>> SendAsync<T, TOutput>(T message)
     {
-        var service = serviceProvider.GetService<IMediatorImplementation>();
-        if (service == null)
+        var services = serviceProvider.GetServices<IMediatorImplementation>().ToList();
+        if (services is {Count: 0})
         {
             throw new NoImplementationException();
         }
         
-        return service.SendAsync<T, TOutput>(message);
+        foreach (var service in services)
+        {
+            var result = await service.SendAsync<T, TOutput>(message);
+            
+            return result;
+        }
+
+        return new NoImplementationException();
     }
 }

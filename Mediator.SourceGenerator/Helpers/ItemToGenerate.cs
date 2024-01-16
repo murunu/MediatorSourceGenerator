@@ -2,6 +2,6 @@
 
 internal class ItemToGenerate(string className, string interfaceName)
 {
-    public string ClassName { get; set; } = className;
-    public string InterfaceName { get; set; } = interfaceName;
+    public string ClassName { get; } = className;
+    public string InterfaceName { get; } = interfaceName;
 }
