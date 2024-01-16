@@ -13,7 +13,6 @@ namespace Mediator.SourceGenerator;
 [Generator]
 public class ServicesGenerator : IIncrementalGenerator
 {
-    
     public void Initialize(IncrementalGeneratorInitializationContext context) {
         context.RegisterPostInitializationOutput(context => context.AddSource(
             "MediatorServicesExtensions.g.cs",
