@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Xunit.Microsoft.DependencyInjection;
 using Xunit.Microsoft.DependencyInjection.Abstracts;
 
-namespace Mediator.UnitTests;
+namespace Mediator.UnitTests.Fixtures;
 
 
 public class BaseMediatorTestFixture : TestBedFixture

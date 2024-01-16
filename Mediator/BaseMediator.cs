@@ -1,4 +1,5 @@
 ﻿using Mediator.Exceptions;
+using Mediator.Helpers;
 using Mediator.Implementations.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 

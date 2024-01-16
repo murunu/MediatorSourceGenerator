@@ -1,4 +1,5 @@
 using Mediator.Exceptions;
+using Mediator.UnitTests.Fixtures;
 using TestReceivers.Async;
 using TestReceivers.Void;
 using Xunit.Abstractions;
