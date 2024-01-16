@@ -37,10 +37,9 @@ public static class AsyncEndpoints
     /// </summary>
     /// <param name="mediator"></param>
     /// <returns></returns>
-    private static async Task<string> SendFailure(IMediator mediator)
+    private static async Task SendFailure(IMediator mediator)
     {
         await mediator.SendAsync(1);
-        return "Oops, something went wrong";
     }
 
     /// <summary>
@@ -80,10 +79,9 @@ public static class AsyncEndpoints
     /// <param name="page"></param>
     /// <param name="mediator"></param>
     /// <returns></returns>
-    private static async Task<string> SendWithValueFailure(string page, IMediator mediator)
+    private static async Task SendWithValueFailure(string page, IMediator mediator)
     {
-        var result = await mediator.SendAsync<string, string>(page);
-        
-        return result;
+        // This will throw an exception, no need to do anything with the result
+        await mediator.SendAsync<string, string>(page);
     }
 }

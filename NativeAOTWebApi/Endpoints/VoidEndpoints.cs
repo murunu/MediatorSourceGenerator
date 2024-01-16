@@ -37,10 +37,9 @@ public static class VoidEndpoints
         /// </summary>
         /// <param name="mediator"></param>
         /// <returns></returns>
-        private static string SendFailure(IMediator mediator)
+        private static void SendFailure(IMediator mediator)
         {
             mediator.Send(1);
-            return "Oops, something went wrong";
         }
     
         /// <summary>
@@ -80,10 +79,9 @@ public static class VoidEndpoints
         /// <param name="page"></param>
         /// <param name="mediator"></param>
         /// <returns></returns>
-        private static string SendWithValueFailure(string page, IMediator mediator)
+        private static void SendWithValueFailure(string page, IMediator mediator)
         {
-            var result = mediator.Send<string, string>(page);
-            
-            return result;
+            // This will throw an exception, no need to do anything with the result
+            mediator.Send<string, string>(page);
         }
 }
