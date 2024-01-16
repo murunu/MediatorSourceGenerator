@@ -16,4 +16,8 @@
     <ItemGroup>
       <ProjectReference Include="..\TestReceivers\TestReceivers.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <InternalsVisibleTo Include="NativeAOTWebApi.Tests" />
+    </ItemGroup>
 </Project>

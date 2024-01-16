@@ -49,3 +49,6 @@ app.MapGet("/sendwithvalue/error", async (string page, IMediator mediator)
     => await mediator.SendAsync<string, string>(page));
 
 app.Run();
+
+// Add this for testing purposes
+public partial class Program { }

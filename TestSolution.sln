@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mediator", "Mediator", "{F1
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.UnitTests", "Mediator.UnitTests\Mediator.UnitTests.csproj", "{FB5F2C6A-A566-4D1C-B62E-AC154F12B2FC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeAOTWebApi.Tests", "NativeAOTWebApi.Tests\NativeAOTWebApi.Tests.csproj", "{1AF600B8-3BB1-4680-84BA-3C8222C7121F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{FB5F2C6A-A566-4D1C-B62E-AC154F12B2FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB5F2C6A-A566-4D1C-B62E-AC154F12B2FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB5F2C6A-A566-4D1C-B62E-AC154F12B2FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AF600B8-3BB1-4680-84BA-3C8222C7121F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AF600B8-3BB1-4680-84BA-3C8222C7121F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AF600B8-3BB1-4680-84BA-3C8222C7121F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AF600B8-3BB1-4680-84BA-3C8222C7121F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{36AE5344-9F29-431A-824D-0EEB56F8D6C6} = {F11768AC-DCBF-4586-ABF4-EFDDC0B3FE61}
