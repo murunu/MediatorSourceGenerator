@@ -1,4 +1,4 @@
-﻿using Mediator.Exceptions;
+using Mediator.Exceptions;
 using Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -58,7 +58,7 @@ public class MediatorBase(IServiceProvider serviceProvider)
         
         if (service == null)
         {
-            throw new NoServiceException(typeof(T));
+            throw new NoServiceException(typeof(T), typeof(TOutput));
         }
         
         return service.Receive(message);
