@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Mediator.SourceGenerator\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" />
+      <ProjectReference Include="..\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" />
       <ProjectReference Include="..\Mediator\Mediator.csproj" />
     </ItemGroup>
 
