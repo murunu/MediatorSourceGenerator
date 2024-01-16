@@ -4,7 +4,7 @@ namespace NativeAOTWebApi.Tests;
 
 public class NativeAOTWebApiTests : IClassFixture<NativeAOTWebApiFactory>
 {
-    private HttpClient _httpClient;
+    private readonly HttpClient _httpClient;
 
     public NativeAOTWebApiTests(NativeAOTWebApiFactory nativeAotWebApiFactory)
     {
