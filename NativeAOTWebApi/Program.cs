@@ -1,4 +1,6 @@
 using Mediator;
+using TestReceivers.Async;
+using TestReceivers.Void;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -10,7 +12,9 @@ var app = builder.Build();
 // The default receiver in this example writes the message to the console.
 app.MapGet("/send/success", async (IMediator mediator) =>
 {
-    await mediator.SendAsync("A random message!");
+    await mediator.SendAsync(
+        new ReceiverType("A random message!"));
+    
     return "Only 1 message sent!";
 });
 
@@ -26,7 +30,8 @@ app.MapGet("/send/error", async (IMediator mediator) =>
 // The default receivers in this example each write the message to the console.
 app.MapGet("/publish", async (IMediator mediator) =>
 {
-    await mediator.PublishAsync("A random message!");
+    await mediator.PublishAsync(
+        new AsyncReceiverType("A random message!"));
 
     return "It worked!";
 });
@@ -34,11 +39,13 @@ app.MapGet("/publish", async (IMediator mediator) =>
 // This endpoint should return a random number appended to the message.
 // Example url: http://localhost:5120/sendwithvalue/success?page=A random message!
 app.MapGet("/sendwithvalue/success", async (string page, IMediator mediator) 
-    => await mediator.SendAsync<string, string>(page));
+    => (await mediator.SendAsync<AsyncReceiverType, AsyncReceiverResponseType>(
+        new AsyncReceiverType(page)))
+    .ToString());
 
 // This endpoint throws an exception because there is no receiver with <string, int> configured.
 // Example url: http://localhost:5120/sendwithvalue/error?page=A random message!
 app.MapGet("/sendwithvalue/error", async (string page, IMediator mediator) 
-    => (await mediator.SendAsync<string, int>(page)).ToString());
+    => await mediator.SendAsync<string, string>(page));
 
 app.Run();
