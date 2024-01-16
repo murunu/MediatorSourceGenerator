@@ -57,19 +57,28 @@ public class AsyncReceiverWithResponse : Mediator.Interfaces.IAsyncReceiver<stri
 
 	public static partial class ConfigureMediator
 	{
-		public static void AddMediator(this Microsoft.Extensions.DependencyInjection.IServiceCollection services)
+		public static Mediator.MediatorConfiguration AddSourceGenerator(this Mediator.MediatorConfiguration mediatorConfiguration)
 		{
-			Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddScoped<Mediator.Interfaces.IReceiver<string>, TestReceivers.Receiver>(services);
+			Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddScoped<Mediator.Interfaces.IReceiver<string>, TestReceivers.Receiver>(mediatorConfiguration.Services);
 
-			Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddScoped<Mediator.Interfaces.IAsyncReceiver<string>, TestReceivers.AsyncReceiver>(services);
+			Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddScoped<Mediator.Interfaces.IAsyncReceiver<string>, TestReceivers.AsyncReceiver>(mediatorConfiguration.Services);
 
-			Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddScoped<Mediator.Interfaces.IReceiver<string, string>, TestReceivers.ReceiverWithResponse>(services);
+			Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddScoped<Mediator.Interfaces.IReceiver<string, string>, TestReceivers.ReceiverWithResponse>(mediatorConfiguration.Services);
 
-			Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddScoped<Mediator.Interfaces.IAsyncReceiver<string, string>, TestReceivers.AsyncReceiverWithResponse>(services);
+			Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddScoped<Mediator.Interfaces.IAsyncReceiver<string, string>, TestReceivers.AsyncReceiverWithResponse>(mediatorConfiguration.Services);
 
-			Microsoft.Extensions.DependencyInjection.Extensions.ServiceCollectionDescriptorExtensions.TryAddScoped<Mediator.IMediator, Mediator.MediatorBase>(services);
 
-		}
+            if (mediatorConfiguration.Services
+                .Any(x => x.ServiceType == typeof(Mediator.Implementations.DefaultMediator)))
+            {
+                return mediatorConfiguration;
+            }
+        	Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddScoped<Mediator.Implementations.Interfaces.IMediatorImplementation, Mediator.Implementations.DefaultMediator>(mediatorConfiguration.Services);
+
+
+            return mediatorConfiguration;
+        }
+
 	}
 }
 ";
@@ -99,7 +108,6 @@ public class AsyncReceiverWithResponse : Mediator.Interfaces.IAsyncReceiver<stri
         // All generated files can be found in 'RunResults.GeneratedTrees'.
         var generatedFileSyntax = runResult.GeneratedTrees.Single(t => t.FilePath.EndsWith("Mediator.g.cs"));
 
-        var filecontents = generatedFileSyntax.GetText().ToString();
         // Complex generators should be tested using text comparison.
         Assert.Equal(ExpectedGeneratedClassText,
             generatedFileSyntax.GetText().ToString(),

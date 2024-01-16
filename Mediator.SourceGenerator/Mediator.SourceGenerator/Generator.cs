@@ -150,10 +150,6 @@ public class ServicesGenerator : IIncrementalGenerator
             {
                 x.AddScopedService(member);
             }
-
-            x.TryAddScopedService(new ItemToGenerate(
-                "Mediator.MediatorBase", 
-                "Mediator.IMediator"));
         });
         
         return result.ToString();

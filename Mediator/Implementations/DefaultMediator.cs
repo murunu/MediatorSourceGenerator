@@ -1,11 +1,12 @@
 ﻿using Mediator.Exceptions;
+using Mediator.Implementations.Interfaces;
 using Mediator.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Mediator;
+namespace Mediator.Implementations;
 
-public class MediatorBase(IServiceProvider serviceProvider)
-    : IMediator
+public class DefaultMediator(IServiceProvider serviceProvider)
+    : IMediatorImplementation
 {
     public void Send<T>(T message)
     {

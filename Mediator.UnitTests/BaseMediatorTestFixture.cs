@@ -10,7 +10,9 @@ public class BaseMediatorTestFixture : TestBedFixture
 {
     protected override void AddServices(IServiceCollection services, IConfiguration? configuration)
         => services
-            .AddMediator();
+            .AddMediator()
+            .AddDefaultMediator()
+            .AddSourceGenerator();
 
     protected override IEnumerable<TestAppSettings> GetTestAppSettings()
     {

@@ -32,7 +32,7 @@ public static class StringBuilderHelper
         
         stringBuilder.Append("{", indentation);
 
-        stringBuilder.AddMethod("AddMediator", indentation + 1, childItems);
+        stringBuilder.AddMethod("AddSourceGenerator", indentation + 1, childItems);
         
         stringBuilder.Append("}", indentation);
         stringBuilder.AppendLine();
@@ -45,7 +45,7 @@ public static class StringBuilderHelper
     {
         stringBuilder.AppendLine();
         
-        stringBuilder.Append($"public static void {methodName}(this Microsoft.Extensions.DependencyInjection.IServiceCollection services)", indentation);
+        stringBuilder.Append($"public static Mediator.MediatorConfiguration {methodName}(this Mediator.MediatorConfiguration mediatorConfiguration)", indentation);
         
         stringBuilder.AppendLine();
         
@@ -53,8 +53,24 @@ public static class StringBuilderHelper
         stringBuilder.AppendLine();
 
         childItems(stringBuilder);
-        
-        stringBuilder.Append("}", indentation);
+
+        stringBuilder.Append(@"
+            if (mediatorConfiguration.Services
+                .Any(x => x.ServiceType == typeof(Mediator.Implementations.DefaultMediator)))
+            {
+                return mediatorConfiguration;
+            }
+        ");
+        stringBuilder.AddScopedService(
+            new ItemToGenerate(
+                "Mediator.Implementations.DefaultMediator",
+                "Mediator.Implementations.Interfaces.IMediatorImplementation"
+            ), 
+            indentation - 1);
+        stringBuilder.Append(@"
+            return mediatorConfiguration;
+        }
+");
         stringBuilder.AppendLine();
 
         return stringBuilder;
@@ -84,7 +100,7 @@ public static class StringBuilderHelper
             
         stringBuilder.Append(", ");
         stringBuilder.Append(itemToGenerate.ClassName);
-        stringBuilder.Append(">(services);");
+        stringBuilder.Append(">(mediatorConfiguration.Services);");
         stringBuilder.AppendLine();
         stringBuilder.AppendLine();
 

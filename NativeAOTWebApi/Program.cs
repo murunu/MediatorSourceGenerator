@@ -3,7 +3,8 @@ using NativeAOTWebApi.Endpoints;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
-builder.Services.AddMediator();
+builder.Services.AddMediator()
+    .AddSourceGenerator();
 
 var app = builder.Build();
 
@@ -13,4 +14,4 @@ app.MapVoidEndpoints();
 app.Run();
 
 // Add this for testing purposes
-public partial class Program { }
+public partial class Program;
