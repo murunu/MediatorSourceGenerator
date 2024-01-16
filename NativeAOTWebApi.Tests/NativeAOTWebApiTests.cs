@@ -2,14 +2,9 @@ using System.Net;
 
 namespace NativeAOTWebApi.Tests;
 
-public class NativeAOTWebApiTests : IClassFixture<NativeAOTWebApiFactory>
+public class NativeAOTWebApiTests(NativeAOTWebApiFactory nativeAotWebApiFactory) : IClassFixture<NativeAOTWebApiFactory>
 {
-    private readonly HttpClient _httpClient;
-
-    public NativeAOTWebApiTests(NativeAOTWebApiFactory nativeAotWebApiFactory)
-    {
-        _httpClient = nativeAotWebApiFactory.CreateClient();
-    }
+    private readonly HttpClient _httpClient = nativeAotWebApiFactory.CreateClient();
 
     [Theory]
     [InlineData("/async/send/success", "Only 1 message sent!")]

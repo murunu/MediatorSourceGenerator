@@ -13,10 +13,4 @@ public class AsyncReceiver : IAsyncReceiver<AsyncReceiverType>
     }
 }
 
-public class AsyncReceiverType : BaseHandler
-{
-    public AsyncReceiverType(string name) : base(name)
-    {
-        
-    }
-}
+public class AsyncReceiverType(string name) : BaseHandler(name);

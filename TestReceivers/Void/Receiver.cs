@@ -13,10 +13,4 @@ public class Receiver : IReceiver<ReceiverType>
     }
 }
 
-public class ReceiverType : BaseHandler
-{
-    public ReceiverType(string name) : base(name)
-    {
-        
-    }
-}
+public class ReceiverType(string name) : BaseHandler(name);
