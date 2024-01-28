@@ -8,7 +8,7 @@ namespace Mediator.Implementations;
 public class DefaultMediator(IServiceProvider serviceProvider)
     : IMediatorImplementation
 {
-    public MediatorResult Send<T>(T message)
+    public MediatorResult Send<T>(T message) where T : IRequest
     {
         var service = serviceProvider.GetService<IReceiver<T>>();
         if (service == null)
@@ -21,7 +21,7 @@ public class DefaultMediator(IServiceProvider serviceProvider)
         return MediatorResult.Success();
     }
 
-    public async Task<MediatorResult> SendAsync<T>(T message)
+    public async Task<MediatorResult> SendAsync<T>(T message) where T : IRequest
     {
         var service = serviceProvider.GetService<IAsyncReceiver<T>>();
         if (service == null)
@@ -34,7 +34,7 @@ public class DefaultMediator(IServiceProvider serviceProvider)
         return MediatorResult.Success();
     }
 
-    public MediatorResult Publish<T>(T message)
+    public MediatorResult Publish<T>(T message) where T : IRequest
     {
         var services = serviceProvider.GetServices<IReceiver<T>>().ToList();
         
@@ -46,7 +46,7 @@ public class DefaultMediator(IServiceProvider serviceProvider)
         return MediatorResult.Success(services.Count);
     }
 
-    public async Task<MediatorResult> PublishAsync<T>(T message)
+    public async Task<MediatorResult> PublishAsync<T>(T message) where T : IRequest
     {
         List<Task> tasks = [];
         
@@ -62,7 +62,7 @@ public class DefaultMediator(IServiceProvider serviceProvider)
         return MediatorResult.Success(tasks.Count);
     }
 
-    public MediatorResult<TOutput> Send<T, TOutput>(T message)
+    public MediatorResult<TOutput> Send<T, TOutput>(T message) where T : IRequest
     {
         var service = serviceProvider.GetService<IReceiver<T, TOutput>>();
         
@@ -74,7 +74,7 @@ public class DefaultMediator(IServiceProvider serviceProvider)
         return service.Receive(message);
     }
 
-    public async Task<MediatorResult<TOutput>> SendAsync<T, TOutput>(T message)
+    public async Task<MediatorResult<TOutput>> SendAsync<T, TOutput>(T message) where T : IRequest
     {
         var service = serviceProvider.GetService<IAsyncReceiver<T, TOutput>>();
 

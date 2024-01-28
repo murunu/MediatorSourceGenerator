@@ -10,8 +10,14 @@ public class AsyncReceiverWithReturn : IAsyncReceiver<AsyncReceiverType, AsyncRe
     {
         Console.WriteLine($"Received message: {message}");
 
-        return new AsyncReceiverResponseType(message.Name);
+        return new AsyncReceiverResponseType(message.Name)
+        {
+            Number = message.Number
+        };
     }
 }
 
-public class AsyncReceiverResponseType(string name) : BaseHandler(name);
+public class AsyncReceiverResponseType(string name) : BaseHandler(name)
+{
+    public int Number { get; set; }
+}

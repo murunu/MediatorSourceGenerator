@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Microsoft.DependencyInjection;
 using Xunit.Microsoft.DependencyInjection.Abstracts;
@@ -19,6 +20,7 @@ public class BaseMediatorTestFixture : TestBedFixture
         return Array.Empty<TestAppSettings>();
     }
 
+    [ExcludeFromCodeCoverage]
     protected override ValueTask DisposeAsyncCore()
     {
         return new ValueTask();

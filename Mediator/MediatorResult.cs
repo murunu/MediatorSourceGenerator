@@ -16,6 +16,12 @@ public class MediatorResult<TValue> : MediatorResult
     public static implicit operator MediatorResult<TValue>(TValue value) => new(value);
 
     public static implicit operator MediatorResult<TValue> (Exception exception) => new(exception);
+    
+    public TResult Match<TResult>(Func<TValue, TResult> success, Func<List<Exception>, TResult> failure) =>
+        IsSuccess ? success(Value) : failure(Exceptions);
+
+    public async Task<TResult> Match<TResult>(Func<TValue, Task<TResult>> success, Func<List<Exception>, TResult> failure) =>
+        IsSuccess ? await success(Value) : failure(Exceptions);
 }
 
 public class MediatorResult
@@ -59,6 +65,9 @@ public class MediatorResult
         mediatorResult.Count += other.Count;
         return mediatorResult;
     }
+    
+    public TResult Match<TResult>(Func<TResult> success, Func<List<Exception>, TResult> failure) =>
+        IsSuccess ? success() : failure(Exceptions);
     
     public void ThrowIfFailure()
     {

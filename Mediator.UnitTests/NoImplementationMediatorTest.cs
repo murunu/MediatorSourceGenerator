@@ -16,12 +16,7 @@ public class NoImplementationMediatorTest : TestBed<NoImplementationMediatorTest
         NoImplementationMediatorTestFixture fixture)
         : base(testOutputHelper, fixture)
     {
-        if (_fixture.GetService<IMediator>(_testOutputHelper) is not { } mediator)
-        {
-            throw new Exception("Can not get IMediator from service provider.");
-        }
-
-        _mediator = mediator;
+        _mediator = _fixture.GetService<IMediator>(_testOutputHelper);
     }
     
     [Fact]

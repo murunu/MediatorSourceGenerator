@@ -14,3 +14,5 @@ public class Receiver : IReceiver<ReceiverType>
 }
 
 public class ReceiverType(string name) : BaseHandler(name);
+
+public class UnregisteredReceiverType(string name) : BaseHandler(name);

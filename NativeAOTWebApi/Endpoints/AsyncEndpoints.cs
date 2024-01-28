@@ -1,5 +1,6 @@
 ﻿using Mediator;
 using TestReceivers.Async;
+using TestReceivers.Void;
 
 namespace NativeAOTWebApi.Endpoints;
 
@@ -39,7 +40,7 @@ public static class AsyncEndpoints
     /// <returns></returns>
     private static async Task SendFailure(IMediator mediator)
     {
-        var result = await mediator.SendAsync(1);
+        var result = await mediator.SendAsync(new UnregisteredReceiverType(""));
         result.ThrowIfFailure();
     }
 
@@ -82,7 +83,7 @@ public static class AsyncEndpoints
     /// <returns></returns>
     private static async Task SendWithValueFailure(string page, IMediator mediator)
     {
-        var result = await mediator.SendAsync<string, string>(page);
+        var result = await mediator.SendAsync<UnregisteredReceiverType, string>(new UnregisteredReceiverType(page));
         
         result.ThrowIfFailure();
     }

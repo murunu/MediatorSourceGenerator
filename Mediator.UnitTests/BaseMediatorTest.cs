@@ -1,4 +1,6 @@
 using Mediator.Exceptions;
+using Mediator.Interfaces;
+using Mediator.Middleware;
 using Mediator.UnitTests.Fixtures;
 using TestReceivers.Async;
 using TestReceivers.Void;
@@ -10,19 +12,12 @@ namespace Mediator.UnitTests;
 public class BaseMediatorTest : TestBed<BaseMediatorTestFixture>
 {
     private readonly IMediator _mediator;
-    
     private const string Message = "Hello World!";
-    private const int Number = 1;
     
     public BaseMediatorTest(ITestOutputHelper testOutputHelper, BaseMediatorTestFixture fixture)
         : base(testOutputHelper, fixture)
     {
-        if (_fixture.GetService<IMediator>(_testOutputHelper) is not { } mediator)
-        {
-            throw new Exception("Can not get IMediator from service provider.");
-        }
-
-        _mediator = mediator;
+        _mediator = _fixture.GetService<IMediator>(_testOutputHelper);
     }
     
     [Fact]
@@ -97,7 +92,7 @@ public class BaseMediatorTest : TestBed<BaseMediatorTestFixture>
     [Fact]
     public async Task SendAsyncWithInvalidTypeShouldThrowException()
     {
-        var result = await _mediator.SendAsync(Number);
+        var result = await _mediator.SendAsync(new UnregisteredReceiverType(Message));
         var exception = Assert.Throws<AggregateException>(result.ThrowIfFailure);
         Assert.IsType<NoServiceException>(exception.InnerException);
     }
@@ -105,7 +100,7 @@ public class BaseMediatorTest : TestBed<BaseMediatorTestFixture>
     [Fact]
     public void SendWithInvalidTypeShouldThrowException()
     {
-        var result = _mediator.Send(Number);
+        var result = _mediator.Send(new UnregisteredReceiverType(Message));
         var exception = Assert.Throws<AggregateException>(result.ThrowIfFailure);
         Assert.IsType<NoServiceException>(exception.InnerException);
     }
@@ -113,9 +108,8 @@ public class BaseMediatorTest : TestBed<BaseMediatorTestFixture>
     [Fact]
     public async Task SendAsyncWithInvalidReturnTypeShouldThrowException()
     {
-        const string message = "Hello World!";
-
-        var result = await _mediator.SendAsync<string, int>(message);
+        var result = await _mediator.SendAsync<UnregisteredReceiverType, int>(
+            new UnregisteredReceiverType(Message));
         
         var exception = Assert.Throws<AggregateException>(() => result.ThrowIfFailure());
         Assert.IsType<NoServiceException>(exception.InnerException);
@@ -124,9 +118,8 @@ public class BaseMediatorTest : TestBed<BaseMediatorTestFixture>
     [Fact]
     public void SendWithInvalidReturnTypeShouldThrowException()
     {
-        const string message = "Hello World!";
-
-        var result = _mediator.Send<string, int>(message);
+        var result = _mediator.Send<UnregisteredReceiverType, int>(
+            new UnregisteredReceiverType(Message));
         
         var exception = Assert.Throws<AggregateException>(() => result.ThrowIfFailure());
         Assert.IsType<NoServiceException>(exception.InnerException);

@@ -1,6 +1,8 @@
-﻿namespace TestReceivers;
+﻿using Mediator.Interfaces;
 
-public class BaseHandler(string name)
+namespace TestReceivers;
+
+public class BaseHandler(string name) : IRequest
 {
     public string Name { get; } = name;
 

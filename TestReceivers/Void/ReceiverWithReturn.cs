@@ -15,4 +15,7 @@ public class ReceiverWithReturn : IReceiver<ReceiverType, ReceiverResponseType>
     }
 }
 
-public class ReceiverResponseType(string name) : BaseHandler(name);
+public class ReceiverResponseType(string name) : BaseHandler(name)
+{
+    public int Number { get; }
+}

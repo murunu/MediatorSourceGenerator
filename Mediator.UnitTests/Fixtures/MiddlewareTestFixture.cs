@@ -6,11 +6,14 @@ using Xunit.Microsoft.DependencyInjection.Abstracts;
 
 namespace Mediator.UnitTests.Fixtures;
 
-public class NoImplementationMediatorTestFixture : TestBedFixture
+public class MiddlewareTestFixture : TestBedFixture
 {
     protected override void AddServices(IServiceCollection services, IConfiguration? configuration)
         => services
-            .AddMediator();
+            .AddMediator()
+            .AddSourceGenerator()
+            .AddMediatorMiddleware<RequestMiddleWare1>()
+            .AddMediatorMiddleware<RequestMiddleWare2>();
 
     protected override IEnumerable<TestAppSettings> GetTestAppSettings()
     {

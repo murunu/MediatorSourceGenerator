@@ -39,7 +39,7 @@ public static class VoidEndpoints
         /// <returns></returns>
         private static void SendFailure(IMediator mediator)
         {
-            var result = mediator.Send(1);
+            var result = mediator.Send(new UnregisteredReceiverType(""));
             
             result.ThrowIfFailure();
         }
@@ -83,7 +83,8 @@ public static class VoidEndpoints
         /// <returns></returns>
         private static void SendWithValueFailure(string page, IMediator mediator)
         {
-            var result = mediator.Send<string, string>(page);
+            var result = mediator.Send<UnregisteredReceiverType, string>(
+                new UnregisteredReceiverType(page));
             
             result.ThrowIfFailure();
         }

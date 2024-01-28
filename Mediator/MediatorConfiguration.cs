@@ -1,5 +1,7 @@
-﻿using Mediator.Implementations;
+﻿using System.Security.Claims;
+using Mediator.Implementations;
 using Mediator.Implementations.Interfaces;
+using Mediator.Middleware.Interface;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator;
@@ -14,6 +16,7 @@ public static class Services
     public static MediatorConfiguration AddMediator(this IServiceCollection services)
     {
         services.AddScoped<IMediator, BaseMediator>();
+        services.AddScoped<IMediatorMiddleware, MediatorMiddleware>();
         
         return new MediatorConfiguration(services);
     }
@@ -21,6 +24,17 @@ public static class Services
     public static MediatorConfiguration AddDefaultMediator(this MediatorConfiguration services)
     {
         services.Services.AddScoped<IMediatorImplementation, DefaultMediator>();
+        
+        return services;
+    }
+
+    public static MediatorConfiguration AddMediatorMiddleware<TMiddleware>(this MediatorConfiguration services)
+        where TMiddleware : class, IRequestMiddleware =>
+        AddMediatorMiddleWare(services, typeof(TMiddleware));
+    
+    public static MediatorConfiguration AddMediatorMiddleWare(this MediatorConfiguration services, Type middlewareType)
+    {
+        services.Services.AddScoped(typeof(IRequestMiddleware), middlewareType);
         return services;
     }
 }
