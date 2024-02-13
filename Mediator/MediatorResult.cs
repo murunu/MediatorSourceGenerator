@@ -19,9 +19,6 @@ public class MediatorResult<TValue> : MediatorResult
     
     public TResult Match<TResult>(Func<TValue, TResult> success, Func<List<Exception>, TResult> failure) =>
         IsSuccess ? success(Value) : failure(Exceptions);
-
-    public async Task<TResult> Match<TResult>(Func<TValue, Task<TResult>> success, Func<List<Exception>, TResult> failure) =>
-        IsSuccess ? await success(Value) : failure(Exceptions);
 }
 
 public class MediatorResult
@@ -53,7 +50,6 @@ public class MediatorResult
     public static MediatorResult Success() => new(true);
     public static MediatorResult Success(int count) => new(true, count);
     public static MediatorResult Failure(Exception exception) => new(exception);
-    public static MediatorResult Failure() => new(false);
     
     public static MediatorResult operator + (MediatorResult mediatorResult, MediatorResult other)
     {

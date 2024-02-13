@@ -1,6 +1,4 @@
 using Mediator.Exceptions;
-using Mediator.Interfaces;
-using Mediator.Middleware;
 using Mediator.UnitTests.Fixtures;
 using TestReceivers.Async;
 using TestReceivers.Void;
