@@ -6,10 +6,12 @@ namespace TestReceivers.Void;
 [RegisterMediator]
 public class Receiver : IReceiver<ReceiverType>
 {
-    public void Receive(ReceiverType message)
+    public MediatorResult Receive(ReceiverType message)
     {
         // Handle the received message
         Console.WriteLine($"Received at ConcreteReceiver message: {message}");
+
+        return MediatorResult.Success();
     }
 }
 

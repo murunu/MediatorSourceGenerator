@@ -6,10 +6,11 @@ namespace TestReceivers.Async;
 [RegisterMediator]
 public class AsyncReceiver : IAsyncReceiver<AsyncReceiverType>
 {
-    public async Task ReceiveAsync(AsyncReceiverType message)
+    public Task<MediatorResult> ReceiveAsync(AsyncReceiverType message, CancellationToken cancellationToken)
     {
-        // Handle the received message
-        Console.WriteLine($"Received async message at ConcreteAsyncReceiver: {message}");
+        return Task.FromResult(
+            MediatorResult.Success()
+            );
     }
 }
 

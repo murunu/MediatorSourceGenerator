@@ -2,12 +2,12 @@
 
 public interface IReceiver<in T>
 {
-    void Receive(T message);
+    MediatorResult Receive(T message);
 }
 
 public interface IAsyncReceiver<in T>
 {
-    Task ReceiveAsync(T message);
+    Task<MediatorResult> ReceiveAsync(T message, CancellationToken cancellationToken = default);
 }
 
 public interface IReceiver<in T, out TOutput>

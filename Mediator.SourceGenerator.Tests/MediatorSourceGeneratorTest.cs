@@ -69,11 +69,11 @@ public class AsyncReceiverWithResponse : Mediator.Interfaces.IAsyncReceiver<stri
 
 
             if (mediatorConfiguration.Services
-                .Any(x => x.ServiceType == typeof(Mediator.Implementations.DefaultMediator)))
+                .Any(x => x.ImplementationType == typeof(Mediator.Implementations.DefaultMediatorImplementation)))
             {
                 return mediatorConfiguration;
             }
-        	Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddScoped<Mediator.Implementations.Interfaces.IMediatorImplementation, Mediator.Implementations.DefaultMediator>(mediatorConfiguration.Services);
+        	Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddScoped<Mediator.Implementations.Interfaces.IMediatorImplementation, Mediator.Implementations.DefaultMediatorImplementation>(mediatorConfiguration.Services);
 
 
             return mediatorConfiguration;

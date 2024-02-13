@@ -26,15 +26,15 @@ public class MediatorResult
     public List<Exception> Exceptions { get; } = [];
     public int Count = 1;
     
-    public bool IsSuccess { get; protected init; }
+    public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
 
     protected MediatorResult(bool isSuccess)
     {
         IsSuccess = isSuccess;
     }
-    
-    protected MediatorResult(bool isSuccess, int count)
+
+    private MediatorResult(bool isSuccess, int count)
     {
         IsSuccess = isSuccess;
         Count = count;

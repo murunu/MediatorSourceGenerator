@@ -17,53 +17,89 @@ public class BasePublisher(IServiceProvider serviceProvider, IMediatorMiddleware
             throw new NoImplementationException();
         }
 
-        middleware.Run(message);
-
-        var results = services.Select(x => x.Publish(message)).ToList();
-
-        MediatorResult? result = null;
-        foreach (var item in results)
+        try
         {
-            if (result == null)
-            {
-                result = item;
-                continue;
+            middleware.Run(message);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+
+        List<MediatorResult> results = [];
+        foreach (var service in services)
+        {
+            try
+            { 
+                var result = service.Publish(message);
+
+                results.Add(result);
             }
-            
-            result += item;
+            catch (Exception e)
+            {
+                results.Add(e);
+            }
         }
         
-        return result ?? MediatorResult.Failure(new NoImplementationException());
+        return results.Aggregate(AggregateResult);
     }
 
-    public async Task<MediatorResult> PublishAsync<T>(T message) where T : IRequest
+    public async Task<MediatorResult> PublishAsync<T>(T message, CancellationToken cancellationToken) where T : IRequest
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        
         var services = serviceProvider.GetServices<IMediatorImplementation>()
             .ToList();
         if (services is {Count: 0})
         {
             throw new NoImplementationException();
         }
-        
-        middleware.Run(message);
 
-        var tasks = services.Select(x => x.PublishAsync(message)).ToList();
-
-        await Task.WhenAll(tasks);
-        var results = tasks.Select(x => x.Result).ToList();
-
-        MediatorResult? result = null;
-        foreach (var item in results)
+        try
         {
-            if (result == null)
+            middleware.Run(message);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+
+        List<MediatorResult> results = [];
+        
+        await Parallel.ForEachAsync(services, cancellationToken, async (service, _) =>
+        {
+            try
             {
-                result = item;
-                continue;
+                var result = await service.PublishAsync(message, cancellationToken);
+                
+                results.Add(result);
             }
-            
-            result += item;
+            catch (Exception e)
+            {
+                results.Add(e);
+            }
+        });
+
+        try
+        {
+            var syncResult = Publish(message);
+            if (syncResult is not { IsFailure: true, Exceptions: [NoImplementationException] })
+            {
+                results.Add(syncResult);
+            }
+        }
+        catch (NoImplementationException e)
+        {
+            // Do nothing
+        }
+        catch (Exception e)
+        {
+            results.Add(e);
         }
         
-        return result ?? MediatorResult.Failure(new NoImplementationException());
+        return results.Aggregate(AggregateResult);
     }
+    
+    private static MediatorResult AggregateResult(MediatorResult currentResult, MediatorResult nextResult) => 
+            currentResult + nextResult;
 }

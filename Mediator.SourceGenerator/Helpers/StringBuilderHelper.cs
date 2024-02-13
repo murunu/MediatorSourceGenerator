@@ -56,14 +56,14 @@ public static class StringBuilderHelper
 
         stringBuilder.Append(@"
             if (mediatorConfiguration.Services
-                .Any(x => x.ServiceType == typeof(Mediator.Implementations.DefaultMediator)))
+                .Any(x => x.ImplementationType == typeof(Mediator.Implementations.DefaultMediatorImplementation)))
             {
                 return mediatorConfiguration;
             }
         ");
         stringBuilder.AddScopedService(
             new ItemToGenerate(
-                "Mediator.Implementations.DefaultMediator",
+                "Mediator.Implementations.DefaultMediatorImplementation",
                 "Mediator.Implementations.Interfaces.IMediatorImplementation"
             ), 
             indentation - 1);

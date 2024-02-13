@@ -2,6 +2,7 @@
 using Mediator.Implementations.Interfaces;
 using Mediator.Middleware.Interface;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Mediator;
 
@@ -25,7 +26,7 @@ public static class Services
     
     public static MediatorConfiguration AddDefaultMediator(this MediatorConfiguration services)
     {
-        services.Services.AddScoped<IMediatorImplementation, DefaultMediator>();
+        services.Services.AddScoped<IMediatorImplementation, DefaultMediatorImplementation>();
         
         return services;
     }

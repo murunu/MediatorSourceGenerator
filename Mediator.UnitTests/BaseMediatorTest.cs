@@ -78,13 +78,55 @@ public class BaseMediatorTest : TestBed<BaseMediatorTestFixture>
     [Fact]
     public void PublishShouldRunSuccessfully()
     {
-        _mediator.Publish(new ReceiverType(Message));
+        var result = _mediator.Publish(new ReceiverType(Message));
+        
+        Assert.NotNull(result);
+        Assert.True(result.IsSuccess);
+        Assert.Empty(result.Exceptions);
     }
     
     [Fact]
     public async Task PublishAsyncShouldRunSuccessfully()
     {
-        await _mediator.PublishAsync(new AsyncReceiverType(Message));
+        var mediatorResult = await _mediator.PublishAsync(new AsyncReceiverType(Message));
+        
+        Assert.NotNull(mediatorResult);
+        Assert.True(mediatorResult.IsSuccess);
+        Assert.Empty(mediatorResult.Exceptions);
+    }
+    
+    [Fact]
+    public async Task PublishAsyncWithExceptionsShouldReturnException()
+    {
+        var mediatorResult = await _mediator.PublishAsync(
+            new AsyncReceiverWithExceptionType(Message));
+
+        Assert.NotNull(mediatorResult);
+        Assert.True(mediatorResult.IsFailure);
+        Assert.Equal(2, mediatorResult.Count);
+
+        Assert.All(mediatorResult.Exceptions, exception =>
+        {
+            Assert.Equal("Oh no! An exception occurred!", 
+                exception.Message);
+        });
+    }
+    
+    [Fact]
+    public void PublishWithExceptionsShouldReturnException()
+    {
+        var mediatorResult = _mediator.Publish(
+            new ReceiverWithExceptionType(Message));
+
+        Assert.NotNull(mediatorResult);
+        Assert.True(mediatorResult.IsFailure);
+        Assert.Equal(2, mediatorResult.Count);
+
+        Assert.All(mediatorResult.Exceptions, exception =>
+        {
+            Assert.Equal("Oh no! An exception occurred!", 
+                exception.Message);
+        });
     }
 
     [Fact]

@@ -17,5 +17,5 @@ public interface IPublisher
     /// <param name="message">The message to publish.</param>
     /// <typeparam name="T">The type of the message.</typeparam>
     /// <returns>A task representing the asynchronous operation.</returns>
-    Task<MediatorResult> PublishAsync<T>(T message) where T : IRequest;
+    Task<MediatorResult> PublishAsync<T>(T message, CancellationToken cancellationToken = default) where T : IRequest;
 }

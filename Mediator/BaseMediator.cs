@@ -11,9 +11,9 @@ public class BaseMediator(
         return publisher.Publish(message);
     }
 
-    public Task<MediatorResult> PublishAsync<T>(T message) where T : IRequest
+    public Task<MediatorResult> PublishAsync<T>(T message, CancellationToken cancellationToken) where T : IRequest
     {
-        return publisher.PublishAsync(message);
+        return publisher.PublishAsync(message, cancellationToken);
     }
 
     public MediatorResult Send<T>(T message) where T : IRequest

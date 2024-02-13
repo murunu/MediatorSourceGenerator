@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Implementations;
 
-public class DefaultMediator(IServiceProvider serviceProvider)
+public class DefaultMediatorImplementation(IServiceProvider serviceProvider)
     : IMediatorImplementation
 {
     public MediatorResult Send<T>(T message) where T : IRequest
@@ -37,29 +37,71 @@ public class DefaultMediator(IServiceProvider serviceProvider)
     public MediatorResult Publish<T>(T message) where T : IRequest
     {
         var services = serviceProvider.GetServices<IReceiver<T>>().ToList();
-        
-        foreach (var service in services)
+
+        if (services is not { Count: > 0 })
         {
-            service.Receive(message);
+            throw new NoImplementationException();
         }
         
-        return MediatorResult.Success(services.Count);
+        List<MediatorResult> results = [];
+        foreach (var service in services)
+        {
+            try
+            { 
+                var result = service.Receive(message);
+
+                results.Add(result);
+            }
+            catch (Exception e)
+            {
+                results.Add(e);
+            }
+        }
+        
+        return results.Aggregate((currentResult, nextResult) => currentResult + nextResult);
     }
 
-    public async Task<MediatorResult> PublishAsync<T>(T message) where T : IRequest
+    public async Task<MediatorResult> PublishAsync<T>(T message, CancellationToken cancellationToken) where T : IRequest
     {
         List<Task> tasks = [];
-        
-        tasks.AddRange(
-            serviceProvider
-                .GetServices<IAsyncReceiver<T>>()
-                .Select(x => x.ReceiveAsync(message)));
+        var services = serviceProvider.GetServices<IAsyncReceiver<T>>().ToList();
 
-        tasks.Add(Task.Run(() => Publish(message)));
-
-        await Task.WhenAll(tasks);
+        if(services is not {Count: > 0})
+        {
+            throw new NoImplementationException();
+        }
         
-        return MediatorResult.Success(tasks.Count);
+        List<MediatorResult> results = [];
+        
+        await Parallel.ForEachAsync(services, cancellationToken, async (service, _) =>
+        {
+            try
+            {
+                var result = await service.ReceiveAsync(message, cancellationToken);
+                
+                results.Add(result);
+            }
+            catch (Exception e)
+            {
+                results.Add(e);
+            }
+        });
+
+        try
+        {
+            var syncResult = Publish(message);
+            results.Add(syncResult);
+        }
+        catch (NoImplementationException e)
+        {
+            // Do nothing
+        }
+        catch (Exception e)
+        {
+            results.Add(e);
+        }
+
+        return results.Aggregate((currentResult, nextResult) => currentResult + nextResult);
     }
 
     public MediatorResult<TOutput> Send<T, TOutput>(T message) where T : IRequest
