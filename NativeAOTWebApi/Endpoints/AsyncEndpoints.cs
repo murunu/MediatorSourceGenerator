@@ -25,12 +25,15 @@ public static class AsyncEndpoints
     /// </summary>
     /// <param name="mediator"></param>
     /// <returns></returns>
-    private static async Task<string> SendSuccess(IMediator mediator)
+    private static async Task<IResult> SendSuccess(ISender mediator)
     {
-        await mediator.SendAsync(
+        var result = await mediator.SendAsync(
             new AsyncReceiverType("A random message!"));
     
-        return "Only 1 message sent!";
+        return result.Match(
+            () => Results.Ok("Only 1 message sent!"),
+            Results.BadRequest
+            );
     }
 
     /// <summary>
@@ -38,7 +41,7 @@ public static class AsyncEndpoints
     /// </summary>
     /// <param name="mediator"></param>
     /// <returns></returns>
-    private static async Task SendFailure(IMediator mediator)
+    private static async Task SendFailure(ISender mediator)
     {
         var result = await mediator.SendAsync(new UnregisteredReceiverType(""));
         result.ThrowIfFailure();
@@ -51,12 +54,15 @@ public static class AsyncEndpoints
     /// </summary>
     /// <param name="mediator"></param>
     /// <returns></returns>
-    private static async Task<string> Publish(IMediator mediator)
+    private static async Task<IResult> Publish(IPublisher mediator)
     {
-        await mediator.PublishAsync(
+        var result = await mediator.PublishAsync(
             new AsyncReceiverType("A random message!"));
         
-        return "It worked!";
+        return result.Match(
+            () => Results.Ok("It worked!"),
+            Results.BadRequest
+            );
     }
     
     /// <summary>
@@ -66,12 +72,17 @@ public static class AsyncEndpoints
     /// <param name="page"></param>
     /// <param name="mediator"></param>
     /// <returns></returns>
-    private static async Task<string> SendWithValueSuccess(string page, IMediator mediator)
+    private static async Task<IResult> SendWithValueSuccess(string page, ISender mediator)
     {
         var result = await mediator.SendAsync<AsyncReceiverType, AsyncReceiverResponseType>(
             new AsyncReceiverType(page));
         
-        return result.Value.ToString();
+        result.ThrowIfFailure();
+        
+        return result.Match(
+            success => Results.Ok(success.ToString()),
+            Results.BadRequest
+            );
     }
     
     /// <summary>
@@ -81,7 +92,7 @@ public static class AsyncEndpoints
     /// <param name="page"></param>
     /// <param name="mediator"></param>
     /// <returns></returns>
-    private static async Task SendWithValueFailure(string page, IMediator mediator)
+    private static async Task SendWithValueFailure(string page, ISender mediator)
     {
         var result = await mediator.SendAsync<UnregisteredReceiverType, string>(new UnregisteredReceiverType(page));
         

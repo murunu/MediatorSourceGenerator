@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Json;
 
 namespace NativeAOTWebApi.Tests;
 
@@ -24,7 +25,7 @@ public class NativeAOTWebApiTests(NativeAOTWebApiFactory nativeAotWebApiFactory)
         // Assert
         response.EnsureSuccessStatusCode();
 
-        var responseString = await response.Content.ReadAsStringAsync();
+        var responseString = await response.Content.ReadFromJsonAsync<string>();
 
         Assert.Equal(expected, responseString);
     }

@@ -24,12 +24,15 @@ public static class VoidEndpoints
         /// </summary>
         /// <param name="mediator"></param>
         /// <returns></returns>
-        private static string SendSuccess(IMediator mediator)
+        private static IResult SendSuccess(ISender mediator)
         {
-            mediator.Send(
+            var result = mediator.Send(
                 new ReceiverType("A random message!"));
         
-            return "Only 1 message sent!";
+            return result.Match(
+                () => Results.Ok("Only 1 message sent!"),
+                Results.BadRequest
+                );
         }
     
         /// <summary>
@@ -37,7 +40,7 @@ public static class VoidEndpoints
         /// </summary>
         /// <param name="mediator"></param>
         /// <returns></returns>
-        private static void SendFailure(IMediator mediator)
+        private static void SendFailure(ISender mediator)
         {
             var result = mediator.Send(new UnregisteredReceiverType(""));
             
@@ -51,12 +54,15 @@ public static class VoidEndpoints
         /// </summary>
         /// <param name="mediator"></param>
         /// <returns></returns>
-        private static string Publish(IMediator mediator)
+        private static IResult Publish(IPublisher mediator)
         {
-            mediator.Publish(
+            var result = mediator.Publish(
                 new ReceiverType("A random message!"));
     
-            return "It worked!";
+            return result.Match(
+                () => Results.Ok("It worked!"),
+                Results.BadRequest
+                );
         }
         
         /// <summary>
@@ -66,12 +72,17 @@ public static class VoidEndpoints
         /// <param name="page"></param>
         /// <param name="mediator"></param>
         /// <returns></returns>
-        private static string SendWithValueSuccess(string page, IMediator mediator)
+        private static IResult SendWithValueSuccess(string page, ISender mediator)
         {
             var result = mediator.Send<ReceiverType, ReceiverResponseType>(
                 new ReceiverType(page));
             
-            return result.Value.ToString();
+            result.ThrowIfFailure();
+
+            return result.Match(
+                success => Results.Ok(success.ToString()),
+                Results.BadRequest
+            );
         }
         
         /// <summary>
@@ -81,7 +92,7 @@ public static class VoidEndpoints
         /// <param name="page"></param>
         /// <param name="mediator"></param>
         /// <returns></returns>
-        private static void SendWithValueFailure(string page, IMediator mediator)
+        private static void SendWithValueFailure(string page, ISender mediator)
         {
             var result = mediator.Send<UnregisteredReceiverType, string>(
                 new UnregisteredReceiverType(page));
